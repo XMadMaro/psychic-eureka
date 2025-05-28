@@ -1,0 +1,71 @@
+from fpdf import FPDF
+
+class PDF(FPDF):
+    def header(self):
+        self.set_font("Arial", "B", 14)
+        self.cell(0, 10, "Analiza kosztów usług i marż", ln=1, align="C")
+        self.ln(5)
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font("Arial", "I", 8)
+        self.cell(0, 10, f"Strona {self.page_no()}", align="C")
+
+# Dane usług z PDF + analiza marży
+services = [
+    ("Mycie kostki brukowej", 5, 8),
+    ("Impregnacja kostki brukowej", 6, 10),
+    ("Czyszczenie elewacji", 10, 18),
+    ("Czyszczenie dachów", 12, 30),
+    ("Usuwanie graffiti", 100, 350),
+    ("Czyszczenie ogrodzeń", 10, 18),
+    ("Wypełnianie fug/spoin", 7, 12),
+    ("Mycie tarasów i garaży", 5, 12),
+    ("Odchwaszczanie", 4, 7),
+    ("Mycie ogrodzeń drewnianych", 8, 15),
+    ("Odśnieżanie zimą", 4, 8),
+    ("Przycinanie żywopłotów", 5, 12),
+    ("Renowacja kostki brukowej", 15, 30),
+    ("Malowanie oznaczeń poziomych", 8, 15),
+    ("Mycie paneli fotowoltaicznych", 6, 12),
+    ("Piaskowanie/sodowanie", 20, 50),
+    ("Ozonowanie i dezynfekcja", 100, 400),
+    ("Mycie witryn i przeszkleń", 6, 12),
+    ("Czyszczenie pomników", 80, 200),
+    ("Konserwacja małej architektury", 50, 150),
+    ("Mycie kostki przy magazynach", 4, 7),
+    ("Detailing wnętrz aut", 80, 200),
+    ("Czyszczenie rynien i rur", 10, 18),
+]
+
+# Konfiguracja PDF
+pdf = PDF()
+pdf.add_page()
+pdf.set_font("Arial", "B", 10)
+
+# Nagłówki tabeli
+pdf.cell(70, 8, "Usługa", 1, align="C")
+pdf.cell(25, 8, "Min (zł)", 1, align="C")
+pdf.cell(25, 8, "Max (zł)", 1, align="C")
+pdf.cell(25, 8, "Koszt (zł)", 1, align="C")
+pdf.cell(25, 8, "Marża (%)", 1, ln=1, align="C")
+
+pdf.set_font("Arial", "", 10)
+line_height = 8
+
+for service, min_price, max_price in services:
+    cost = 4.0  # Założony koszt własny
+    avg_price = (min_price + max_price) / 2
+    margin_value = avg_price - cost
+    margin_percent = (margin_value / avg_price) * 100 if avg_price else 0
+
+    pdf.cell(70, line_height, service, 1)
+    pdf.cell(25, line_height, f"{min_price:.2f}", 1, align="C")
+    pdf.cell(25, line_height, f"{max_price:.2f}", 1, align="C")
+    pdf.cell(25, line_height, f"{cost:.2f}", 1, align="C")
+    pdf.cell(25, line_height, f"{margin_percent:.1f}%", 1, ln=1, align="C")
+
+# Zapisz PDF
+output_file = "Analiza_kosztow_i_marz_uslug.pdf"
+pdf.output(output_file)
+print(f"✅ Plik PDF zapisany jako: {output_file}")
